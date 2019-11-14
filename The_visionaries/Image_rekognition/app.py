@@ -3,23 +3,29 @@ import os
 import pandas as pd
 import numpy as np
 
-import sqlalchemy
-from sqlalchemy.ext.automap import automap_base
-from sqlalchemy.orm import Session
-from sqlalchemy import create_engine
-
 from flask import Flask, jsonify, render_template
-from flask_sqlalchemy import SQLAlchemy
+
+from PIL import Image
+import base64
+import re
+import cStringIO
 
 app = Flask(__name__)
-
-
 
 @app.route("/")
 def index():
     """Return the homepage."""
     return render_template("index.html")
 
+
+@app.route('/hook', methods=['POST'])
+def get_image():
+    image_b64 = request.values['imageBase64']
+    image_data = re.sub('^data:image/.+;base64,', '', image_b64).decode('base64')
+    image_PIL = Image.open(cStringIO.StringIO(image_b64))
+    image_np = np.array(image_PIL)
+    print ('Image received: {}'.format(image_np.shape))
+    return ''
 
 # @app.route("/data")
 # def dataquery():

