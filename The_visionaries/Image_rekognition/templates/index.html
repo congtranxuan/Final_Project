@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+crossorigin="anonymous"></script>
+    <script type="text/javascript" src="static/js/jquery-3.4.1.min.js"></script>
 </head>
 <body>
     <div id="screenshot" style="text-align:center;">
@@ -68,12 +72,15 @@
               canvas.width = video.videoWidth;
               canvas.height = video.videoHeight;
               canvas.getContext('2d').drawImage(video, 0, 0);
+              
               // Other browsers will fall back to image/png
               img.src = canvas.toDataURL('image/jpg',1.0);
-              $.ajax({type: "POST", url: "http://url/hook", data:{imageBase64: img.src}})
-              .done(function() {console.log('sent');
-});
-              input.value = canvas.toDataURL('image/jpg',1.0);
+              var dataurl = canvas.toDataURL('image/jpg',1.0);
+              console.log(dataurl);
+              $.ajax({type: "POST", url: "http://url/hook", data:{imageBase64: dataurl}
+            }).done(function() {console.log('sent');
+            });
+              var input.value = canvas.toDataURL('image/jpg',1.0);
               // var link = document.getElementById('link');
               // link.setAttribute('download', 'MintyPaper.png');
               // link.setAttribute('href', img.src.replace("image/png", "image/octet-stream"));
@@ -171,6 +178,7 @@
   }, errorCallback);
 </script> -->
 
-  
+<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.easing.min.js') }}"></script>
 </body>
 </html>

@@ -3,12 +3,12 @@ import os
 import pandas as pd
 import numpy as np
 
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request
 
 from PIL import Image
 import base64
 import re
-import cStringIO
+import io
 
 app = Flask(__name__)
 
@@ -20,11 +20,19 @@ def index():
 
 @app.route('/hook', methods=['POST'])
 def get_image():
-    image_b64 = request.values['imageBase64']
-    image_data = re.sub('^data:image/.+;base64,', '', image_b64).decode('base64')
-    image_PIL = Image.open(cStringIO.StringIO(image_b64))
-    image_np = np.array(image_PIL)
-    print ('Image received: {}'.format(image_np.shape))
+    image_b64 = request.args.get('image')
+
+    content = image_b64.split(';')[1]
+    image_encoded = content.split(',')[1]
+    body = base64.decodebytes(image_encoded.encode('utf-8'))
+
+    print ()
+
+    # image_data = re.sub('^data:image/.+;base64,', '', image_b64).decode('base64')
+    # image_PIL = Image.open(io.StringIO(image_b64))
+    # image_np = np.array(image_PIL)
+    # print ('Image received: {}'.format(image_np.shape))
+    # print(image_np)
     return ''
 
 # @app.route("/data")
