@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div id="screenshot" style="text-align:center;">
+        <video class="videostream" autoplay></video>
+        <img id="screenshot-img">
+        <p><button class="capture-button">Capture video</button> <button id="stop-button">Stop</button></p>
+        <p><button id="screenshot-button" disabled>Take screenshot</button></p>
+      </div>
+
+      <a id="link"></a>
+      
+    <div id="basic" style="text-align:center;">
+        <video class="videostream" autoplay></video>
+        <p><button class="capture-button">Capture video</button></p>
+      </div>
+     
+      <script>
+         
+
+          function handleError(error) {
+            console.error('navigator.getUserMedia error: ', error);
+          }
+          const constraints = {video: true};
+          
+          (function() {
+            const video = document.querySelector('#screenshot video');
+            const captureVideoButton = document.querySelector('#basic .capture-button');
+            let localMediaStream;
+          
+            function handleSuccess(stream) {
+              localMediaStream = stream;
+              video.srcObject = stream;
+            }
+          
+            captureVideoButton.onclick = function() {
+              navigator.mediaDevices.getUserMedia(constraints).
+                then(handleSuccess).catch(handleError);
+            };
+          
+            document.querySelector('#stop-button').onclick = function() {
+              video.pause();
+              localMediaStream.stop();
+            };
+          })();
+          
+          (function() {
+            const captureVideoButton =
+              document.querySelector('#screenshot .capture-button');
+            const screenshotButton = document.querySelector('#screenshot-button');
+            const img = document.querySelector('#screenshot img');
+            const video = document.querySelector('#screenshot video');
+          
+            const canvas = document.createElement('canvas');
+          
+            captureVideoButton.onclick = function() {
+              navigator.mediaDevices.getUserMedia(constraints).
+                then(handleSuccess).catch(handleError);
+            };
+          
+            screenshotButton.onclick = video.onclick = function() {
+              canvas.width = video.videoWidth;
+              canvas.height = video.videoHeight;
+              canvas.getContext('2d').drawImage(video, 0, 0);
+              // Other browsers will fall back to image/png
+              img.src = canvas.toDataURL('image/png',1.0);
+              var link = document.getElementById('link');
+              link.setAttribute('download', 'MintyPaper.png');
+              link.setAttribute('href', img.src.replace("image/png", "image/octet-stream"));
+              link.click();
+            };
+          
+            function handleSuccess(stream) {
+              screenshotButton.disabled = false;
+              video.srcObject = stream;
+            }
+          })();
+          
+          // (function() {
+          //   const captureVideoButton =
+          //     document.querySelector('#cssfilters .capture-button');
+          //   const cssFiltersButton = document.querySelector('#cssfilters-apply');
+          //   const video = document.querySelector('#cssfilters video');
+          
+          //   let filterIndex = 0;
+          //   const filters = [
+          //     'grayscale',
+          //     'sepia',
+          //     'blur',
+          //     'brightness',
+          //     'contrast',
+          //     'hue-rotate',
+          //     'hue-rotate2',
+          //     'hue-rotate3',
+          //     'saturate',
+          //     'invert',
+          //     ''
+          //   ];
+          
+          //   captureVideoButton.onclick = function() {
+          //     navigator.mediaDevices.getUserMedia(constraints).
+          //       then(handleSuccess).catch(handleError);
+          //   };
+          
+          //   cssFiltersButton.onclick = video.onclick = function() {
+          //     video.className = filters[filterIndex++ % filters.length];
+          //   };
+          
+          //   function handleSuccess(stream) {
+          //     video.srcObject = stream;
+          //   }
+          // })();
+          </script>
+   
+    <!-- <video width = "640" height = "480" autoplay></video>
+    <img src="">
+    <canvas style="display:none;"></canvas>
+
+    <script>
+      var errorCallback = function(e) {
+        console.log('Reeeejected!', e);
+      };
+    
+      // Not showing vendor prefixes.
+      navigator.getUserMedia({video: true, audio: true}, function(localMediaStream) {
+        var video = document.querySelector('video');
+        video.src = window.URL.createObjectURL(localMediaStream);
+    
+        // Note: onloadedmetadata doesn't fire in Chrome when using it with getUserMedia.
+        // See crbug.com/110938.
+        video.onloadedmetadata = function(e) {
+          // Ready to go. Do some stuff.
+        };
+      }, errorCallback);
+    </script>
+
+
+
+<script>
+  var video = document.querySelector('video');
+  var canvas = document.querySelector('canvas');
+  var ctx = canvas.getContext('2d');
+  var localMediaStream = null;
+
+  function snapshot() {
+    if (localMediaStream) {
+      ctx.drawImage(video, 0, 0);
+      // "image/webp" works in Chrome.
+      // Other browsers will fall back to image/png.
+      document.querySelector('img').src = canvas.toDataURL('image/webp');
+    }
+  }
+
+  video.addEventListener('click', snapshot, false);
+
+  // Not showing vendor prefixes or code that works cross-browser.
+  navigator.getUserMedia({video: true}, function(stream) {
+    video.src = window.URL.createObjectURL(stream);
+    localMediaStream = stream;
+  }, errorCallback);
+</script> -->
+
+  
+</body>
+</html>

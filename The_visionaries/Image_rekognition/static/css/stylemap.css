@@ -1,0 +1,58 @@
+body {
+    padding: 0;
+    margin: 0;
+}
+
+#map,
+body,
+html {
+    height: 100%;
+}
+
+h1 {
+    text-align: center;
+}
+
+*************** NEW CODE ***************** .info {
+    padding: 6px 8px;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    background: white;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+
+.info h4 {
+    margin: 0 0 5px;
+    color: #777;
+}
+
+
+
+.legend {
+    padding: 5px;
+    font-family: Sanchez, serif;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 16px;
+    color: #555;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    width:100px;
+    height:200px;
+    vertical-align: middle;
+    display: inline-block;
+   }
+  
+  .square {
+   background: red;
+   width:18px;
+   height:18px;
+   display: inline-block;
+   vertical-align: middle;
+  }
+  .explanation {
+    margin-left: 5px;
+    vertical-align: middle;
+  }
