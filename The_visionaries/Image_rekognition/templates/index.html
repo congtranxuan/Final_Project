@@ -77,7 +77,7 @@ crossorigin="anonymous"></script>
               img.src = canvas.toDataURL('image/jpg',1.0);
               var link = document.getElementById('link');
               link.setAttribute('download', 'imageforrecognition.jpg');
-              link.href = img.src.replace("image/png", "image/octet-stream"));
+              link.href = img.src.replace("image/png", "image/octet-stream");
               link.click();
               
             };
