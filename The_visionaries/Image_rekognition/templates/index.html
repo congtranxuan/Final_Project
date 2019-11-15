@@ -75,17 +75,11 @@ crossorigin="anonymous"></script>
               
               // Other browsers will fall back to image/png
               img.src = canvas.toDataURL('image/jpg',1.0);
-              var dataurl = canvas.toDataURL('image/jpg',1.0);
-              console.log(dataurl);
-              $.ajax({type: "POST", url: "http://url/hook", data:{imageBase64: dataurl}
-            }).done(function() {console.log('sent');
-            });
-              var input.value = canvas.toDataURL('image/jpg',1.0);
-              // var link = document.getElementById('link');
-              // link.setAttribute('download', 'MintyPaper.png');
-              // link.setAttribute('href', img.src.replace("image/png", "image/octet-stream"));
-              // link.click();
-              console.log(img.src);
+              var link = document.getElementById('link');
+              link.setAttribute('download', 'imageforrecognition.jpg');
+              link.href = img.src.replace("image/png", "image/octet-stream"));
+              link.click();
+              
             };
           
             function handleSuccess(stream) {

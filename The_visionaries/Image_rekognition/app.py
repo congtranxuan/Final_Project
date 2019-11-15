@@ -18,22 +18,21 @@ def index():
     return render_template("index.html")
 
 
-@app.route('/hook', methods=['POST'])
-def get_image():
-    image_b64 = request.args.get('image')
+# @app.route('/hook')
+# def get_image():
+#     image_b64 = request.args.get('image')
 
-    content = image_b64.split(';')[1]
-    image_encoded = content.split(',')[1]
-    body = base64.decodebytes(image_encoded.encode('utf-8'))
-
-    print ()
+#     content = image_b64.split(';')[1]
+#     image_encoded = content.split(',')[1]
+#     body = base64.decodebytes(image_encoded.encode('utf-8'))
+#     return body
 
     # image_data = re.sub('^data:image/.+;base64,', '', image_b64).decode('base64')
     # image_PIL = Image.open(io.StringIO(image_b64))
     # image_np = np.array(image_PIL)
     # print ('Image received: {}'.format(image_np.shape))
     # print(image_np)
-    return ''
+
 
 # @app.route("/data")
 # def dataquery():
