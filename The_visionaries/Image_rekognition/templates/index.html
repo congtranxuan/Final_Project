@@ -9,6 +9,13 @@
 integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
 crossorigin="anonymous"></script>
     <script type="text/javascript" src="static/js/jquery-3.4.1.min.js"></script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.572.0.min.js"></script>
+    <script>
+      function getHtml(template) {
+         return template.join('\n');
+      }
+      listAlbums();
+   </script>
 </head>
 <body>
     <div id="screenshot" style="text-align:center;">
@@ -24,10 +31,32 @@ crossorigin="anonymous"></script>
         <video class="videostream" autoplay></video>
         <p><button class="capture-button">Capture video</button></p>
       </div>
-     
-      <script>
-         
+      <div id="app"></div>
 
+      <div class="content">
+        <h3>Flask Drive: S3 Flask Demo</h3>
+        <p>Welcome to this AWS S3 Demo</p>
+        <div>
+          <h3>Upload your file here:</h3>
+          <form method="POST" action="/upload" enctype=multipart/form-data>
+            <input type=file name=file>
+            <input type=submit value=Upload>
+          </form>
+        </div>
+        <div>
+          <h3>These are your uploaded files:</h3>
+          <p>Click on the filename to download it.</p>
+          <ul>
+            {% for item in contents %}
+              <li>
+                <a href="/download/{{ item.Key }}"> {{ item.Key }} </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+    </div>
+      
+      <script>
           function handleError(error) {
             console.error('navigator.getUserMedia error: ', error);
           }
@@ -87,41 +116,57 @@ crossorigin="anonymous"></script>
               video.srcObject = stream;
             }
           })();
+
           
-          // (function() {
-          //   const captureVideoButton =
-          //     document.querySelector('#cssfilters .capture-button');
-          //   const cssFiltersButton = document.querySelector('#cssfilters-apply');
-          //   const video = document.querySelector('#cssfilters video');
-          
-          //   let filterIndex = 0;
-          //   const filters = [
-          //     'grayscale',
-          //     'sepia',
-          //     'blur',
-          //     'brightness',
-          //     'contrast',
-          //     'hue-rotate',
-          //     'hue-rotate2',
-          //     'hue-rotate3',
-          //     'saturate',
-          //     'invert',
-          //     ''
-          //   ];
-          
-          //   captureVideoButton.onclick = function() {
-          //     navigator.mediaDevices.getUserMedia(constraints).
-          //       then(handleSuccess).catch(handleError);
-          //   };
-          
-          //   cssFiltersButton.onclick = video.onclick = function() {
-          //     video.className = filters[filterIndex++ % filters.length];
-          //   };
-          
-          //   function handleSuccess(stream) {
-          //     video.srcObject = stream;
-          //   }
-          // })();
+          var albumBucketName = "BUCKET_NAME";
+          var bucketRegion = "REGION";
+          var IdentityPoolId = "IDENTITY_POOL_ID";
+
+          AWS.config.update({
+          region: bucketRegion,
+          credentials: new AWS.CognitoIdentityCredentials({
+          IdentityPoolId: IdentityPoolId
+          })
+          });
+
+var s3 = new AWS.S3({
+  apiVersion: "2006-03-01",
+  params: { Bucket: albumBucketName }
+});
+
+function addPhoto(albumName) {
+  var files = document.getElementById("photoupload").files;
+  if (!files.length) {
+    return alert("Please choose a file to upload first.");
+  }
+  var file = files[0];
+  var fileName = file.name;
+  var albumPhotosKey = encodeURIComponent(albumName) + "//";
+
+  var photoKey = albumPhotosKey + fileName;
+
+  // Use S3 ManagedUpload class as it supports multipart uploads
+  var upload = new AWS.S3.ManagedUpload({
+    params: {
+      Bucket: finalprojectawsrekognition,
+      Key: photoKey,
+      Body: file,
+      ACL: "public-read"
+    }
+  });
+
+  var promise = upload.promise();
+
+  promise.then(
+    function(data) {
+      alert("Successfully uploaded photo.");
+      viewAlbum(albumName);
+    },
+    function(err) {
+      return alert("There was an error uploading your photo: ", err.message);
+    }
+  );
+}
           </script>
    
     <!-- <video width = "640" height = "480" autoplay></video>
