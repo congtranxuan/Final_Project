@@ -1,41 +1,23 @@
 import os
-
 import pandas as pd
 import numpy as np
-
-from flask import Flask, jsonify, render_template, request
-
-from PIL import Image
-import base64
-import re
-import io
+from flask import Flask, render_template, request, redirect, send_file, url_for, jsonify
+from s3_function import list_files, download_file, upload_file
 
 app = Flask(__name__)
 
-
-import os
-
-from flask import Flask, render_template, request, redirect, send_file, url_for
-
-from s3_demo import list_files, download_file, upload_file
-
-
-app = Flask(__name__)
 UPLOAD_FOLDER = "uploads"
-BUCKET = "insert_bucket_name_here"
-
+BUCKET = "finalprojectawsrekognition"   
 
 @app.route("/")
 def index():
     """Return the homepage."""
     return render_template("index.html")
 
-
 @app.route("/storage")
 def storage():
-    contents = list_files("flaskdrive")
-    return render_template('storage.html', contents=contents)
-
+    contents = list_files(BUCKET)
+    return render_template('index.html', contents=contents)
 
 @app.route("/upload", methods=['POST'])
 def upload():
@@ -43,20 +25,49 @@ def upload():
         f = request.files['file']
         f.save(f.filename)
         upload_file(f"{f.filename}", BUCKET)
-
-        return redirect("/storage")
-
+        print(f)
+        return redirect("/")
 
 @app.route("/download/<filename>", methods=['GET'])
 def download(filename):
     if request.method == 'GET':
         output = download_file(filename, BUCKET)
-
         return send_file(output, as_attachment=True)
 
+@app.route("/rekognition")
+def image_rekognition():
+    BUCKET = "finalprojectawsrekognition"
+    KEY_SOURCE = "jessica1.jpeg"
+    KEY_TARGET = "jessica2.jpg"
 
-if __name__ == '__main__':
-    app.run(debug=True)
+def compare_faces(bucket, key, bucket_target, key_target, threshold=80):
+	rekognition = boto3.client("rekognition")
+	response = rekognition.compare_faces(
+	    SourceImage={
+			"S3Object": {
+				"Bucket": bucket,
+				"Name": key,
+			}
+		},
+		TargetImage={
+			"S3Object": {
+				"Bucket": bucket_target,
+				"Name": key_target,
+			}
+		},
+	    SimilarityThreshold=threshold,
+	)
+	return response['SourceImageFace'], response['FaceMatches']
+
+
+source_face, matches = compare_faces(BUCKET, KEY_SOURCE, BUCKET, KEY_TARGET)
+
+# the main source face
+print (f"Source_face: {source_face}")
+
+# one match for each target face
+for match in matches:
+	print(match)
 
 # @app.route('/hook')
 # def get_image():

@@ -10,12 +10,12 @@ integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6ji
 crossorigin="anonymous"></script>
     <script type="text/javascript" src="static/js/jquery-3.4.1.min.js"></script>
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.572.0.min.js"></script>
-    <script>
+    <!-- <script>
       function getHtml(template) {
          return template.join('\n');
       }
       listAlbums();
-   </script>
+   </script> -->
 </head>
 <body>
     <div id="screenshot" style="text-align:center;">
@@ -27,10 +27,6 @@ crossorigin="anonymous"></script>
 
       <a id="link"></a>
       
-    <div id="basic" style="text-align:center;">
-        <video class="videostream" autoplay></video>
-        <p><button class="capture-button">Capture video</button></p>
-      </div>
       <div id="app"></div>
 
       <div class="content">
@@ -62,41 +58,45 @@ crossorigin="anonymous"></script>
           }
           const constraints = {video: true};
           
+          // (function() {
+          //   const video = document.querySelector('#screenshot video');
+          //   const captureVideoButton = document.querySelector('#screenshot .capture-button');
+          //   let localMediaStream;
+          
+          //   function handleSuccess(stream) {
+          //     localMediaStream = stream;
+          //     video.srcObject = stream;
+          //   }
+          
+          //   captureVideoButton.onclick = function() {
+          //     navigator.mediaDevices.getUserMedia(constraints).
+          //       then(handleSuccess).catch(handleError);
+          //   };
+          
+          //   document.querySelector('#stop-button').onclick = function() {
+          //     video.pause();
+          //     localMediaStream.stop();
+          //   };
+          // })();
+          
           (function() {
-            const video = document.querySelector('#screenshot video');
-            const captureVideoButton = document.querySelector('#basic .capture-button');
-            let localMediaStream;
-          
-            function handleSuccess(stream) {
-              localMediaStream = stream;
-              video.srcObject = stream;
-            }
-          
-            captureVideoButton.onclick = function() {
-              navigator.mediaDevices.getUserMedia(constraints).
-                then(handleSuccess).catch(handleError);
-            };
-          
-            document.querySelector('#stop-button').onclick = function() {
-              video.pause();
-              localMediaStream.stop();
-            };
-          })();
-          
-          (function() {
-            const captureVideoButton =
-              document.querySelector('#screenshot .capture-button');
+            const captureVideoButton = document.querySelector('#screenshot .capture-button');
             const screenshotButton = document.querySelector('#screenshot-button');
             const img = document.querySelector('#screenshot img');
             const video = document.querySelector('#screenshot video');
-          
+            let localMediaStream;
             const canvas = document.createElement('canvas');
           
             captureVideoButton.onclick = function() {
               navigator.mediaDevices.getUserMedia(constraints).
                 then(handleSuccess).catch(handleError);
             };
-          
+
+            document.querySelector('#stop-button').onclick = function() {
+              video.pause();
+              localMediaStream.stop();
+            };
+
             screenshotButton.onclick = video.onclick = function() {
               canvas.width = video.videoWidth;
               canvas.height = video.videoHeight;
@@ -108,6 +108,7 @@ crossorigin="anonymous"></script>
               link.setAttribute('download', 'imageforrecognition.jpg');
               link.href = img.src.replace("image/png", "image/octet-stream");
               link.click();
+              console.log(link);
               
             };
           
