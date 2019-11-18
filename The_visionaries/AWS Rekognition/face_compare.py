@@ -28,6 +28,7 @@ source_face, matches = compare_faces(BUCKET, KEY_SOURCE, BUCKET, KEY_TARGET)
 
 # the main source face
 print (f"Source_face: {source_face}")
+print(matches)
 
 # one match for each target face
 for match in matches:

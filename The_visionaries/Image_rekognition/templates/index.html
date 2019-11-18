@@ -25,7 +25,7 @@ crossorigin="anonymous"></script>
         <p><button id="screenshot-button" disabled>Take screenshot</button></p>
       </div>
 
-      <a id="link"></a>
+      <!-- <a id="link"></a> -->
       
       <div id="app"></div>
 
@@ -34,9 +34,9 @@ crossorigin="anonymous"></script>
         <p>Welcome to this AWS S3 Demo</p>
         <div>
           <h3>Upload your file here:</h3>
-          <form method="POST" action="/upload" enctype=multipart/form-data>
-            <input type=file name=file>
-            <input type=submit value=Upload>
+          <form method="POST" action ="/upload" enctype=multipart/form-data>
+            <input id="imgtext" type="text" name="imgtext">
+            <input id = "uploadimage" type=submit value=Upload>
           </form>
         </div>
         <div>
@@ -104,11 +104,13 @@ crossorigin="anonymous"></script>
               
               // Other browsers will fall back to image/png
               img.src = canvas.toDataURL('image/jpg',1.0);
-              var link = document.getElementById('link');
-              link.setAttribute('download', 'imageforrecognition.jpg');
-              link.href = img.src.replace("image/png", "image/octet-stream");
-              link.click();
-              console.log(link);
+              document.querySelector('#imgtext').setAttribute('value', img.src);
+              document.querySelector('#uploadimage').click()
+              // var link = document.getElementById('link');
+              // link.setAttribute('download', 'imageforrecognition.jpg');
+              // link.href = img.src.replace("image/jpg", "image/octet-stream");
+              // link.click();
+              // console.log(img.src);
               
             };
           
@@ -119,55 +121,55 @@ crossorigin="anonymous"></script>
           })();
 
           
-          var albumBucketName = "BUCKET_NAME";
-          var bucketRegion = "REGION";
-          var IdentityPoolId = "IDENTITY_POOL_ID";
+//           var albumBucketName = "BUCKET_NAME";
+//           var bucketRegion = "REGION";
+//           var IdentityPoolId = "IDENTITY_POOL_ID";
 
-          AWS.config.update({
-          region: bucketRegion,
-          credentials: new AWS.CognitoIdentityCredentials({
-          IdentityPoolId: IdentityPoolId
-          })
-          });
+//           AWS.config.update({
+//           region: bucketRegion,
+//           credentials: new AWS.CognitoIdentityCredentials({
+//           IdentityPoolId: IdentityPoolId
+//           })
+//           });
 
-var s3 = new AWS.S3({
-  apiVersion: "2006-03-01",
-  params: { Bucket: albumBucketName }
-});
+// var s3 = new AWS.S3({
+//   apiVersion: "2006-03-01",
+//   params: { Bucket: albumBucketName }
+// });
 
-function addPhoto(albumName) {
-  var files = document.getElementById("photoupload").files;
-  if (!files.length) {
-    return alert("Please choose a file to upload first.");
-  }
-  var file = files[0];
-  var fileName = file.name;
-  var albumPhotosKey = encodeURIComponent(albumName) + "//";
+// function addPhoto(albumName) {
+//   var files = document.getElementById("photoupload").files;
+//   if (!files.length) {
+//     return alert("Please choose a file to upload first.");
+//   }
+//   var file = files[0];
+//   var fileName = file.name;
+//   var albumPhotosKey = encodeURIComponent(albumName) + "//";
 
-  var photoKey = albumPhotosKey + fileName;
+//   var photoKey = albumPhotosKey + fileName;
 
-  // Use S3 ManagedUpload class as it supports multipart uploads
-  var upload = new AWS.S3.ManagedUpload({
-    params: {
-      Bucket: finalprojectawsrekognition,
-      Key: photoKey,
-      Body: file,
-      ACL: "public-read"
-    }
-  });
+//   // Use S3 ManagedUpload class as it supports multipart uploads
+//   var upload = new AWS.S3.ManagedUpload({
+//     params: {
+//       Bucket: finalprojectawsrekognition,
+//       Key: photoKey,
+//       Body: file,
+//       ACL: "public-read"
+//     }
+//   });
 
-  var promise = upload.promise();
+//   var promise = upload.promise();
 
-  promise.then(
-    function(data) {
-      alert("Successfully uploaded photo.");
-      viewAlbum(albumName);
-    },
-    function(err) {
-      return alert("There was an error uploading your photo: ", err.message);
-    }
-  );
-}
+//   promise.then(
+//     function(data) {
+//       alert("Successfully uploaded photo.");
+//       viewAlbum(albumName);
+//     },
+//     function(err) {
+//       return alert("There was an error uploading your photo: ", err.message);
+//     }
+//   );
+// }
           </script>
    
     <!-- <video width = "640" height = "480" autoplay></video>
