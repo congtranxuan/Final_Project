@@ -18,39 +18,36 @@ crossorigin="anonymous"></script>
    </script> -->
 </head>
 <body>
+    <h1>Welcome to the registration page</h1>
+    <h2>Please add your information in and take picture to register</h2>
+    <ul>
+     {% for item in contents %}
+        <li>
+          <p>{{item["imglink"]}}</p>
+          <p>{{item["fullname"]}}</p>
+          <p>{{item["email"]}}</p>
+        </li>
+      {% endfor %}
+    </ul>
+
+
     <div id="screenshot" style="text-align:center;">
-        <video class="videostream" autoplay></video>
+        <video width = "200" height = "150" class="videostream" autoplay></video>
         <img id="screenshot-img">
         <p><button class="capture-button">Capture video</button> <button id="stop-button">Stop</button></p>
-        <p><button id="screenshot-button" disabled>Take screenshot</button></p>
-      </div>
-
-      <!-- <a id="link"></a> -->
-      
-      <div id="app"></div>
-
-      <div class="content">
-        <h3>Flask Drive: S3 Flask Demo</h3>
-        <p>Welcome to this AWS S3 Demo</p>
-        <div>
-          <h3>Upload your file here:</h3>
-          <form method="POST" action ="/upload" enctype=multipart/form-data>
-            <input id="imgtext" type="text" name="imgtext">
-            <input id = "uploadimage" type=submit value=Upload>
-          </form>
-        </div>
-        <div>
-          <h3>These are your uploaded files:</h3>
-          <p>Click on the filename to download it.</p>
-          <ul>
-            {% for item in contents %}
-              <li>
-                <a href="/download/{{ item.Key }}"> {{ item.Key }} </a>
-              </li>
-            {% endfor %}
-          </ul>
-        </div>
     </div>
+    <form method="POST" action ="/update_members" enctype=multipart/form-data>
+      <div>Full Name: <input name = "fullname" type = "text"> </did>
+      <div>Email: <input name = "email" type = "text"> </div>
+      <input id="imgtext" type="text" name="imagecode" style = "visibility: hidden">
+      <input id = "uploadimage" type=submit value=Upload style = "visibility: hidden">
+  </form>
+    <div>
+        <p><button id="screenshot-button" disabled>Take screenshot</button></p>
+    </div>
+
+    
+        
       
       <script>
           function handleError(error) {
@@ -58,27 +55,7 @@ crossorigin="anonymous"></script>
           }
           const constraints = {video: true};
           
-          // (function() {
-          //   const video = document.querySelector('#screenshot video');
-          //   const captureVideoButton = document.querySelector('#screenshot .capture-button');
-          //   let localMediaStream;
-          
-          //   function handleSuccess(stream) {
-          //     localMediaStream = stream;
-          //     video.srcObject = stream;
-          //   }
-          
-          //   captureVideoButton.onclick = function() {
-          //     navigator.mediaDevices.getUserMedia(constraints).
-          //       then(handleSuccess).catch(handleError);
-          //   };
-          
-          //   document.querySelector('#stop-button').onclick = function() {
-          //     video.pause();
-          //     localMediaStream.stop();
-          //   };
-          // })();
-          
+                    
           (function() {
             const captureVideoButton = document.querySelector('#screenshot .capture-button');
             const screenshotButton = document.querySelector('#screenshot-button');
