@@ -20,20 +20,33 @@ crossorigin="anonymous"></script>
 <body>
     <h1>Welcome to the registration page</h1>
     <h2>Please add your information in and take picture to register</h2>
+    <ul>
+     {% for item in contents %}
+        <li>
+          <p>{{item["imglink"]}}</p>
+          <p>{{item["fullname"]}}</p>
+          <p>{{item["email"]}}</p>
+        </li>
+      {% endfor %}
+    </ul>
+
 
     <div id="screenshot" style="text-align:center;">
-        <video class="videostream" autoplay></video>
+        <video width = "200" height = "150" class="videostream" autoplay></video>
         <img id="screenshot-img">
         <p><button class="capture-button">Capture video</button> <button id="stop-button">Stop</button></p>
+    </div>
+    <form method="POST" action ="/update_members" enctype=multipart/form-data>
+      <div>Full Name: <input name = "fullname" type = "text"> </did>
+      <div>Email: <input name = "email" type = "text"> </div>
+      <input id="imgtext" type="text" name="imagecode" style = "visibility: hidden">
+      <input id = "uploadimage" type=submit value=Upload style = "visibility: hidden">
+  </form>
+    <div>
         <p><button id="screenshot-button" disabled>Take screenshot</button></p>
     </div>
 
-    <form method="POST" action ="/upload" enctype=multipart/form-data>
-        <input name = "imp" type = "text">
-        <input id="name" type="text" name="imgtext">
-
-        <input id = "uploadimage" type=submit value=Upload>
-    </form>
+    
         
       
       <script>

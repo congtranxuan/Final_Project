@@ -14,14 +14,24 @@ import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
-
 from flask_sqlalchemy import SQLAlchemy
 
-
 app = Flask(__name__)
+database_name = 'Team_member'
+# engine = create_engine(f'postgresql://postgres:{password}@127.0.0.1:5432/{database_name}')
+# conn = engine.connect()
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///static/db/Team_member.db"
+db = SQLAlchemy(app)
+# reflect an existing database into a new model
+Base = automap_base()
+# reflect the tables
+Base.prepare(db.engine, reflect=True)
+
+# Save references to each table
+Member = Base.classes.member
 
 UPLOAD_FOLDER = "uploads"
-BUCKET = "finalprojectawsrekognition"   
+BUCKET = "sourceimageforrekognition"   
 
 @app.route("/")
 def index():
@@ -30,18 +40,59 @@ def index():
 
 @app.route("/registration")
 def registration():
-    return render_template("registration.html")
+    stmt = db.session.query(Member).statement
+    contents = pd.read_sql_query(stmt, db.session.bind)
+    df = pd.DataFrame(contents)
+    alist = []
+    for i in range(len(df["fullname"])):
+        data = {}
+        image_name = "https://usersuploadimages.s3.us-east-2.amazonaws.com/" + df.loc[i,"fullname"] + ".jpg"
+        data["imglink"] = image_name
+        data["fullname"]=df.loc[i,"fullname"]
+        data["email"]=df.loc[i,"email"]
+        alist.append(data)    
+    print(alist)    
+        
+    return render_template("registration.html", contents = alist)
 
 
-# @app.route("/storage")
-# def storage():
-#     contents = list_files(BUCKET)
-#     return render_template('index.html', contents=contents)
+@app.route("/update_members", methods=['POST'])
+def update_members():
+     if request.method == "POST":
+        imgstring = request.form['imagecode']
+        fullname = request.form['fullname']
+        email = request.form["email"]
+
+        print(fullname)
+        print(email)
+
+        a_member = Member(fullname=fullname, email=email)
+        db.session.add(a_member)
+        db.session.commit()
+        
+        print("Database was updated a new member")
+
+        imgstring = re.sub('^data:image/.+;base64,', '', imgstring)
+        imgdata = base64.b64decode(imgstring)
+        image_name = fullname + ".jpg"
+        with open(image_name, 'wb') as f:
+            f.write(imgdata)
+
+        f.filename = image_name
+        upload_file(f"{f.filename}","usersuploadimages")
+        return redirect("/registration")
+
+
+@app.route("/storage")
+def storage():
+    contents = list_files(BUCKET)
+    print(contents)
+    return render_template('index.html', contents=contents)
 
 @app.route("/upload", methods=['POST'])
 def upload():
     if request.method == "POST":
-        imgstring = request.form['imgtext']
+        imgstring = request.form['imagecode']
         text = request.form['imp']
         print(text)
         imgstring = re.sub('^data:image/.+;base64,', '', imgstring)
