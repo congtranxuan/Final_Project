@@ -18,44 +18,82 @@ crossorigin="anonymous"></script>
    </script> -->
 </head>
 <body>
-    <h1>Welcome to the registration page</h1>
-    <h2>Please add your information in and take picture to register</h2>
-    <ul>
-     {% for item in contents %}
-        <li>
-          <img src= {{item["imglink"]}}>
-          <p>{{item["fullname"]}}</p>
-          <p>{{item["email"]}}</p>
-        </li>
-      {% endfor %}
-    </ul>
-
-
     <div id="screenshot" style="text-align:center;">
         <video width = "200" height = "150" class="videostream" autoplay></video>
         <img id="screenshot-img">
         <p><button class="capture-button">Capture video</button> <button id="stop-button">Stop</button></p>
     </div>
-    <form method="POST" action ="/update_members" enctype=multipart/form-data>
-      <div>Full Name: <input name = "fullname" type = "text"> </did>
-      <div>Email: <input name = "email" type = "text"> </div>
-      <input id="imgtext" type="text" name="imagecode" style = "visibility: hidden">
-      <input id = "uploadimage" type=submit value=Upload style = "visibility: hidden">
-  </form>
+           
+    <form method="POST" action ="/upload" enctype=multipart/form-data>
+        <input id="imgtext" type="text" name="imagecode" style = "visibility: hidden">
+        <input id = "uploadimage" type=submit value=Upload style = "visibility: hidden">
+    </form>
     <div>
         <p><button id="screenshot-button" disabled>Take screenshot</button></p>
     </div>
 
+    <div>
+        {% for item in contents %}
+            <img src= {{ item }}>
+        {% endfor %}
+    </div>
+
+    <form action='/face_comparision' method="POST">
+        <button name="Rekognization" type="Submit">Recognizing Face</button>
+    </form>    
+
+    <div>
+        {% for item in target_image %}
+            <img src= {{ item }}>
+        {% endfor %}
+    </div>
     
-        
-      
-      <script>
+    <div>
+        {% for item in confidence %}
+         <p>{{ item }}></p>
+           
+        {% endfor %}
+    </div>
+
+
+    <script>
+
+        // var url = '/image_link';
+        // d3.json(url).then(function(response) {
+        // var newsample = response;
+        // console.log(newsample);
+        // var metadata = d3.select("#sample-metadata").html("");
+        // console.log(metadata);
+        // Object.entries(newsample).forEach(([key,value])=>{
+        //   metadata.append("div").append("b").text(`${key} : ${value}`);
+        //   });
+
           function handleError(error) {
             console.error('navigator.getUserMedia error: ', error);
           }
           const constraints = {video: true};
           
-                    
+          // (function() {
+          //   const video = document.querySelector('#screenshot video');
+          //   const captureVideoButton = document.querySelector('#screenshot .capture-button');
+          //   let localMediaStream;
+          
+          //   function handleSuccess(stream) {
+          //     localMediaStream = stream;
+          //     video.srcObject = stream;
+          //   }
+          
+          //   captureVideoButton.onclick = function() {
+          //     navigator.mediaDevices.getUserMedia(constraints).
+          //       then(handleSuccess).catch(handleError);
+          //   };
+          
+          //   document.querySelector('#stop-button').onclick = function() {
+          //     video.pause();
+          //     localMediaStream.stop();
+          //   };
+          // })();
+          
           (function() {
             const captureVideoButton = document.querySelector('#screenshot .capture-button');
             const screenshotButton = document.querySelector('#screenshot-button');
@@ -96,6 +134,11 @@ crossorigin="anonymous"></script>
               video.srcObject = stream;
             }
           })();
+
+
+
+        // var rekognize = document.querySelector('#rekognize-face');
+        // rekognize.click() = function(){action='/face_comparision'}
 
           
 //           var albumBucketName = "BUCKET_NAME";
@@ -199,5 +242,6 @@ crossorigin="anonymous"></script>
 
 <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/jquery.easing.min.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.5.0/d3.js"></script>
 </body>
 </html>

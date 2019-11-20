@@ -17,8 +17,9 @@ from sqlalchemy import create_engine
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-database_name = 'Team_member'
-# engine = create_engine(f'postgresql://postgres:{password}@127.0.0.1:5432/{database_name}')
+#database_name = 'Team_member'
+database = "database-2"
+#engine = create_engine(f'postgresql://postgres:{password}@database-2.cq0ruejyag78.us-east-2.rds.amazonaws.com:5432/{database_name}')
 # conn = engine.connect()
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///static/db/Team_member.db"
 db = SQLAlchemy(app)
@@ -83,26 +84,14 @@ def update_members():
         return redirect("/registration")
 
 
-@app.route("/storage")
-def storage():
-    contents = list_files(BUCKET)
-    print(contents)
-    return render_template('index.html', contents=contents)
+# @app.route("/storage")
+# def storage():
+#     contents = list_files(BUCKET)
+#     print(contents)
+#     return render_template('index.html', contents=contents)
 
-@app.route("/upload", methods=['POST'])
-def upload():
-    if request.method == "POST":
-        imgstring = request.form['imagecode']
-        text = request.form['imp']
-        print(text)
-        imgstring = re.sub('^data:image/.+;base64,', '', imgstring)
-        imgdata = base64.b64decode(imgstring)
-        with open('imageforrecognition.jpg', 'wb') as f:
-            f.write(imgdata)
 
-        f.filename = 'imageforrecognition.jpg'
-        upload_file(f"{f.filename}","usersuploadimages")
-        return redirect("/")
+      
 
 @app.route("/download/<filename>", methods=['GET'])
 def download(filename):
@@ -110,41 +99,76 @@ def download(filename):
         output = download_file(filename, BUCKET)
         return send_file(output, as_attachment=True)
 
-@app.route("/face_compare")
+@app.route("/upload", methods=['POST'])
+def upload():
+    if request.method == "POST":
+        imgstring = request.form['imagecode']
+        imgstring = re.sub('^data:image/.+;base64,', '', imgstring)
+        imgdata = base64.b64decode(imgstring)
+        with open('face_compare_image.jpg', 'wb') as f:
+            f.write(imgdata)
+
+        f.filename = 'face_compare_image.jpg'
+        upload_file(f"{f.filename}","sourceimageforrekognition")
+        imglink = "https://sourceimageforrekognition.s3.us-east-2.amazonaws.com/" + f.filename
+        upload_imglink = [imglink]
+        return render_template("face_compare1.html", contents = upload_imglink, target_image = [], confidence = [])
+
+def compare_faces(bucket, key, bucket_target, key_target, threshold=90):
+    rekognition = boto3.client("rekognition")
+    response = rekognition.compare_faces(
+        SourceImage={
+            "S3Object": {
+                "Bucket": bucket,
+                "Name": key,
+            }
+        },
+        TargetImage={
+            "S3Object": {
+                "Bucket": bucket_target,
+                "Name": key_target,
+            }
+        },
+        SimilarityThreshold=threshold,
+    )
+    return response['SourceImageFace'], response['FaceMatches']
+
+
+@app.route("/face_comparision", methods = ['POST'])
 def face_compare():
-    KEY_BUCKET = "finalprojectawsrekognition"
-    KEY_SOURCE = "jessica1.jpeg"
-    KEY_TARGET = "jessica2.jpg"
+    if request.method == 'POST':
+        stmt = db.session.query(Member).statement
+        contents = pd.read_sql_query(stmt, db.session.bind)
+        df = pd.DataFrame(contents)
+              
 
-    def compare_faces(bucket, key, bucket_target, key_target, threshold=90):
-	    rekognition = boto3.client("rekognition")
-	    response = rekognition.compare_faces(
-	        SourceImage={
-			    "S3Object": {
-				    "Bucket": bucket,
-				    "Name": key,
-			    }
-		    },
-		    TargetImage={
-			    "S3Object": {
-				    "Bucket": bucket_target,
-				    "Name": key_target,
-			    }
-		    },
-	        SimilarityThreshold=threshold,
-	    )
-	    return response['SourceImageFace'], response['FaceMatches']
+        SOURCE_BUCKET = "sourceimageforrekognition"
+        TARGET_BUCKET = "usersuploadimages"
+        KEY_SOURCE = "face_compare_image.jpg"
+        max_confidence = 90
+        target = ''
 
+        for i in range(len(df["fullname"])):
+            KEY_TARGET = df.loc[i,"fullname"] + ".jpg"
+            source_face, matches = compare_faces(SOURCE_BUCKET, KEY_SOURCE, TARGET_BUCKET, KEY_TARGET)
 
-    source_face, matches = compare_faces(BUCKET, KEY_SOURCE, BUCKET, KEY_TARGET)
+            for match in matches:
+                confidence = match['Face']['Confidence']
+                if confidence > max_confidence:
+                    target = KEY_TARGET
+                    max_confidence = confidence
+        print(max_confidence)            
+        target_imglink = ["https://usersuploadimages.s3.us-east-2.amazonaws.com/" + target]  
+        imglink = "https://sourceimageforrekognition.s3.us-east-2.amazonaws.com/" + 'face_compare_image.jpg'
+        upload_imglink = [imglink]
+        return render_template("face_compare1.html", contents = upload_imglink, target_image = target_imglink, confidence = [max_confidence])
 
-    # the main source face
-    print (f"Source_face: {source_face}")
+      
 
-# one match for each target face
-    for match in matches:
-	    print(match)
-    return jsonify(source_face)    
+@app.route("/face_compare") 
+def compare_page():
+    return render_template("face_compare1.html")
+
 
 # app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db/bellybutton.sqlite"
 # db = SQLAlchemy(app)
