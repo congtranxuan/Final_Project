@@ -31,12 +31,14 @@ Base.prepare(db.engine, reflect=True)
 Member = Base.classes.member
 
 UPLOAD_FOLDER = "uploads"
-BUCKET = "sourceimageforrekognition"   
+BUCKET = "sourceimageforrekognition"
+
 
 @app.route("/")
 def index():
     """Return the homepage."""
     return render_template("registration.html")
+
 
 @app.route("/registration")
 def registration():
@@ -46,19 +48,20 @@ def registration():
     alist = []
     for i in range(len(df["fullname"])):
         data = {}
-        image_name = "https://usersuploadimages.s3.us-east-2.amazonaws.com/" + df.loc[i,"fullname"] + ".jpg"
+        image_name = "https://usersuploadimages.s3.us-east-2.amazonaws.com/" + \
+            df.loc[i, "fullname"] + ".jpg"
         data["imglink"] = image_name
-        data["fullname"]=df.loc[i,"fullname"]
-        data["email"]=df.loc[i,"email"]
-        alist.append(data)    
-    print(alist)    
-        
-    return render_template("registration.html", contents = alist)
+        data["fullname"] = df.loc[i, "fullname"]
+        data["email"] = df.loc[i, "email"]
+        alist.append(data)
+    print(alist)
+
+    return render_template("registration.html", contents=alist)
 
 
 @app.route("/update_members", methods=['POST'])
 def update_members():
-     if request.method == "POST":
+    if request.method == "POST":
         imgstring = request.form['imagecode']
         fullname = request.form['fullname']
         email = request.form["email"]
@@ -69,7 +72,7 @@ def update_members():
         a_member = Member(fullname=fullname, email=email)
         db.session.add(a_member)
         db.session.commit()
-        
+
         print("Database was updated a new member")
 
         imgstring = re.sub('^data:image/.+;base64,', '', imgstring)
@@ -79,7 +82,7 @@ def update_members():
             f.write(imgdata)
 
         f.filename = image_name
-        upload_file(f"{f.filename}","usersuploadimages")
+        upload_file(f"{f.filename}", "usersuploadimages")
         return redirect("/registration")
 
 
@@ -98,6 +101,7 @@ def download(filename):
         output = download_file(filename, BUCKET)
         return send_file(output, as_attachment=True)
 
+
 @app.route("/upload", methods=['POST'])
 def upload():
     if request.method == "POST":
@@ -107,6 +111,7 @@ def upload():
         with open('face_compare_image.jpg', 'wb') as f:
             f.write(imgdata)
 
+<<<<<<< HEAD
         f.filename = 'face_compare_image.jpg'
         upload_file(f"{f.filename}","sourceimageforrekognition")
         imglink = "https://sourceimageforrekognition.s3.us-east-2.amazonaws.com/" + f.filename
@@ -237,37 +242,79 @@ def list_files(bucket):
 
     return contents
    
+=======
+        f.filename = 'imageforrecognition.jpg'
+        upload_file(f"{f.filename}", "usersuploadimages")
+        return redirect("/")
+
+
+@app.route("/download/<filename>", methods=['GET'])
+def download(filename):
+    if request.method == 'GET':
+        output = download_file(filename, BUCKET)
+        return send_file(output, as_attachment=True)
+
+
+@app.route("/face_compare")
+def face_compare():
+    KEY_BUCKET = "finalprojectawsrekognition"
+    KEY_SOURCE = "jessica1.jpeg"
+    KEY_TARGET = "jessica2.jpg"
+
+    def compare_faces(bucket, key, bucket_target, key_target, threshold=90):
+        rekognition = boto3.client("rekognition")
+        response = rekognition.compare_faces(
+            SourceImage={
+                "S3Object": {
+                    "Bucket": bucket,
+                    "Name": key,
+                }
+            },
+            TargetImage={
+                "S3Object": {
+                    "Bucket": bucket_target,
+                    "Name": key_target,
+                }
+            },
+            SimilarityThreshold=threshold,
+        )
+        return response['SourceImageFace'], response['FaceMatches']
+
+    source_face, matches = compare_faces(
+        BUCKET, KEY_SOURCE, BUCKET, KEY_TARGET)
+
+    # the main source face
+    print(f"Source_face: {source_face}")
+
+# one match for each target face
+    for match in matches:
+        print(match)
+    return jsonify(source_face)
+
+
+@app.route("/face_analysis")
+>>>>>>> 6b693181732aba90b702d2b7b0094f486dac6a7f
 # app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db/bellybutton.sqlite"
 # db = SQLAlchemy(app)
-
 # # reflect an existing database into a new model
 # Base = automap_base()
 # # reflect the tables
 # Base.prepare(db.engine, reflect=True)
-
 # # Save references to each table
 # Samples_Metadata = Base.classes.sample_metadata
 # Samples = Base.classes.samples
-
-
 # @app.route("/")
 # def index():
 #     """Return the homepage."""
 #     return render_template("index.html")
-
-
 # @app.route("/names")
 # def names():
 #     """Return a list of sample names."""
-
 #     # Use Pandas to perform the sql query
 #     stmt = db.session.query(Samples).statement
 #     df = pd.read_sql_query(stmt, db.session.bind)
-
 #     # Return a list of the column names (sample names)
 #     return jsonify(list(df.columns)[2:])
-
-
 # @app.route("/metadata/<sample>")
 # def sample_metadata(sample):
 #     """Return the MetaData for a given sample."""
@@ -280,9 +327,7 @@ def list_files(bucket):
 #         Samples_Metadata.BBTYPE,
 #         Samples_Metadata.WFREQ,
 #     ]
-
 #     results = db.session.query(*sel).filter(Samples_Metadata.sample == sample).all()
-
 #     # Create a dictionary entry for each row of metadata information
 #     sample_metadata = {}
 #     for result in results:
@@ -293,24 +338,18 @@ def list_files(bucket):
 #         sample_metadata["LOCATION"] = result[4]
 #         sample_metadata["BBTYPE"] = result[5]
 #         sample_metadata["WFREQ"] = result[6]
-
 #     print(sample_metadata)
 #     return jsonify(sample_metadata)
-
-
 # @app.route("/samples/<sample>")
 # def samples(sample):
 #     """Return `otu_ids`, `otu_labels`,and `sample_values`."""
 #     stmt = db.session.query(Samples).statement
 #     df = pd.read_sql_query(stmt, db.session.bind)
-
 #     # Filter the data based on the sample number and
 #     # only keep rows with values above 1
 #     sample_data = df.loc[df[sample] > 1, ["otu_id", "otu_label", sample]]
-
 #     # Sort by sample
 #     sample_data.sort_values(by=sample, ascending=False, inplace=True)
-
 #     # Format the data to send as json
 #     data = {
 #         "otu_ids": sample_data.otu_id.values.tolist(),
@@ -318,29 +357,22 @@ def list_files(bucket):
 #         "otu_labels": sample_data.otu_label.tolist(),
 #     }
 #     return jsonify(data)
-
 # @app.route('/hook')
 # def get_image():
 #     image_b64 = request.args.get('image')
-
 #     content = image_b64.split(';')[1]
 #     image_encoded = content.split(',')[1]
 #     body = base64.decodebytes(image_encoded.encode('utf-8'))
 #     return body
-
-    # image_data = re.sub('^data:image/.+;base64,', '', image_b64).decode('base64')
-    # image_PIL = Image.open(io.StringIO(image_b64))
-    # image_np = np.array(image_PIL)
-    # print ('Image received: {}'.format(image_np.shape))
-    # print(image_np)
-
-
+# image_data = re.sub('^data:image/.+;base64,', '', image_b64).decode('base64')
+# image_PIL = Image.open(io.StringIO(image_b64))
+# image_np = np.array(image_PIL)
+# print ('Image received: {}'.format(image_np.shape))
+# print(image_np)
 # @app.route("/data")
 # def dataquery():
-    
 #     stmt = db.session.query(Metadata).statement
 #     data = pd.read_sql_query(stmt, db.session.bind)
-        
 #     # Format the data to send as json
 #     keys = ["Country","Continent",
 #         "Bothsexes16","Male16","Female16","Bothsexes15","Male15","Female15",
@@ -356,25 +388,19 @@ def list_files(bucket):
 #         "2011","2011capita","2010","2010capita","2009","2009capita","2008","2008capita",
 #         "2007","2007capita","2006","2006capita","2005","2005capita","2004","2004capita",
 #         "2003","2003capita","2002","2002capita","2001","2001capita","2000","2000capita"]
-    
 #     jsondata =[]
 #     for i in range(len(data["Country"])):
 #         newdata={}
 #         for j in range(len(keys)):
 #             newdata.update({keys[j] : data[keys[j]][i]})
 #         jsondata.append(newdata)
-      
 #     return jsonify(jsondata)
-
 # @app.route("/map")
 # def mapquery():
-    
 #     stmt = db.session.query(Mapdata).statement
 #     data = pd.read_sql_query(stmt, db.session.bind)
-        
 # #     # Format the data to send as json
 # #     keys = ["Country","Bothsexes16"]
-    
 # #     jsondata =[]
 # #     for i in range(len(data["Country"])):
 # #         newdata={}
@@ -382,28 +408,20 @@ def list_files(bucket):
 # #             newdata.update({keys[j] : data[keys[j]][i]})
 # #         jsondata.append(newdata)
 # #     return jsonify(jsondata)
-
 # # @app.route("/country")
 # # def namequery():
-
 # #     stmt = db.session.query(Metadata).statement
 # #     data = pd.read_sql_query(stmt, db.session.bind)
 # #     countries = data["Country"]
 # #     return jsonify(list(countries))
-
-
 # @app.route("/names")
 # def names():
 #     """Return a list of sample names."""
-
 #     # Use Pandas to perform the sql query
 #     stmt = db.session.query(Samples).statement
 #     df = pd.read_sql_query(stmt, db.session.bind)
-
 #     # Return a list of the column names (sample names)
 #     return jsonify(list(df.columns)[2:])
-
-
 # @app.route("/metadata/<sample>")
 # def sample_metadata(sample):
 #     """Return the MetaData for a given sample."""
@@ -416,9 +434,7 @@ def list_files(bucket):
 #         Samples_Metadata.BBTYPE,
 #         Samples_Metadata.WFREQ,
 #     ]
-
 #     results = db.session.query(*sel).filter(Samples_Metadata.sample == sample).all()
-
 #     # Create a dictionary entry for each row of metadata information
 #     sample_metadata = {}
 #     for result in results:
@@ -429,24 +445,18 @@ def list_files(bucket):
 #         sample_metadata["LOCATION"] = result[4]
 #         sample_metadata["BBTYPE"] = result[5]
 #         sample_metadata["WFREQ"] = result[6]
-
 #     print(sample_metadata)
 #     return jsonify(sample_metadata)
-
-
 # @app.route("/samples/<sample>")
 # def samples(sample):
 #     """Return `otu_ids`, `otu_labels`,and `sample_values`."""
 #     stmt = db.session.query(Samples).statement
 #     df = pd.read_sql_query(stmt, db.session.bind)
-
 #     # Filter the data based on the sample number and
 #     # only keep rows with values above 1
 #     sample_data = df.loc[df[sample] > 1, ["otu_id", "otu_label", sample]]
-
 #     # Sort by sample
 #     sample_data.sort_values(by=sample, ascending=False, inplace=True)
-
 #     # Format the data to send as json
 #     data = {
 #         "otu_ids": sample_data.otu_id.values.tolist(),
@@ -454,11 +464,5 @@ def list_files(bucket):
 #         "otu_labels": sample_data.otu_label.tolist(),
 #     }
 #     return jsonify(data)
-
-
 if __name__ == "__main__":
     app.run()
-
-
-
-
