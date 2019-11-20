@@ -33,7 +33,6 @@ Member = Base.classes.member
 UPLOAD_FOLDER = "uploads"
 BUCKET = "sourceimageforrekognition"
 
-
 @app.route("/")
 def index():
     """Return the homepage."""
@@ -111,12 +110,11 @@ def upload():
         with open('face_compare_image.jpg', 'wb') as f:
             f.write(imgdata)
 
-<<<<<<< HEAD
         f.filename = 'face_compare_image.jpg'
         upload_file(f"{f.filename}","sourceimageforrekognition")
         imglink = "https://sourceimageforrekognition.s3.us-east-2.amazonaws.com/" + f.filename
         upload_imglink = [imglink]
-        return render_template("face_compare.html", contents = upload_imglink, target_image = [], confidence = [])
+        return render_template("face_compare.html", contents = upload_imglink, target_image = [])
 
 def compare_faces(bucket, key, bucket_target, key_target, threshold=90, region="us-east-2"):
     rekognition = boto3.client("rekognition",region)
@@ -171,6 +169,40 @@ def face_compare():
 
     return render_template("face_compare.html", contents = upload_imglink, target_image = target)
 
+@app.route("/upload_for_analysis", methods=['POST'])
+def upload():
+    if request.method == "POST":
+        imgstring = request.form['imagecode']
+        imgstring = re.sub('^data:image/.+;base64,', '', imgstring)
+        imgdata = base64.b64decode(imgstring)
+        with open('image_for_face_analysis.jpg', 'wb') as f:
+            f.write(imgdata)
+
+        f.filename = 'image_for_face_analysis.jpg'
+        upload_file(f"{f.filename}","sourceimageforrekognition")
+        imglink = "https://sourceimageforrekognition.s3.us-east-2.amazonaws.com/" + f.filename
+        upload_imglink = [imglink]
+        return render_template("face_analysis.html", contents = upload_imglink, outcome = [])
+
+@app.route('/face_analysis')
+def face_analysis():
+    BUCKET = "sourceimageforrekognition"
+    KEY = "image_for_face_analysis.jpg"
+    FEATURES_BLACKLIST = ("Landmarks", "Emotions", "Pose", "Quality", "BoundingBox", "Confidence")
+    for face in detect_faces(BUCKET, KEY):
+	    print "Face ({Confidence}%)".format(**face)
+	# emotions
+	for emotion in face['Emotions']:
+		print "  {Type} : {Confidence}%".format(**emotion)
+	# quality
+	for quality, value in face['Quality'].iteritems():
+		print "  {quality} : {value}".format(quality=quality, value=value)
+	# facial features
+	for feature, data in face.iteritems():
+		if feature not in FEATURES_BLACKLIST:
+			print "  {feature}({data[Value]}) : {data[Confidence]}%".format(feature=feature, data=data)
+
+
 # @app.route("/face_comparision", methods = ['POST'])
 # def face_compare():
 #     if request.method == 'POST':
@@ -203,7 +235,7 @@ def face_compare():
 
 @app.route("/face_compare") 
 def compare_page():
-    return render_template("face_compare1.html")
+    return render_template("face_compare.html")
 
 def upload_file(file_name, bucket):
     """
@@ -241,59 +273,25 @@ def list_files(bucket):
         pass
 
     return contents
-   
-=======
-        f.filename = 'imageforrecognition.jpg'
-        upload_file(f"{f.filename}", "usersuploadimages")
-        return redirect("/")
+
+def detect_faces(bucket, key, attributes=['ALL'], region="eu-west-1"):
+	rekognition = boto3.client("rekognition", region)
+	response = rekognition.detect_faces(
+	    Image={
+			"S3Object": {
+				"Bucket": bucket,
+				"Name": key,
+			}
+		},
+	    Attributes=attributes,
+	)
+	return response['FaceDetails']
 
 
-@app.route("/download/<filename>", methods=['GET'])
-def download(filename):
-    if request.method == 'GET':
-        output = download_file(filename, BUCKET)
-        return send_file(output, as_attachment=True)
 
 
-@app.route("/face_compare")
-def face_compare():
-    KEY_BUCKET = "finalprojectawsrekognition"
-    KEY_SOURCE = "jessica1.jpeg"
-    KEY_TARGET = "jessica2.jpg"
-
-    def compare_faces(bucket, key, bucket_target, key_target, threshold=90):
-        rekognition = boto3.client("rekognition")
-        response = rekognition.compare_faces(
-            SourceImage={
-                "S3Object": {
-                    "Bucket": bucket,
-                    "Name": key,
-                }
-            },
-            TargetImage={
-                "S3Object": {
-                    "Bucket": bucket_target,
-                    "Name": key_target,
-                }
-            },
-            SimilarityThreshold=threshold,
-        )
-        return response['SourceImageFace'], response['FaceMatches']
-
-    source_face, matches = compare_faces(
-        BUCKET, KEY_SOURCE, BUCKET, KEY_TARGET)
-
-    # the main source face
-    print(f"Source_face: {source_face}")
-
-# one match for each target face
-    for match in matches:
-        print(match)
-    return jsonify(source_face)
 
 
-@app.route("/face_analysis")
->>>>>>> 6b693181732aba90b702d2b7b0094f486dac6a7f
 # app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db/bellybutton.sqlite"
 # db = SQLAlchemy(app)
 # # reflect an existing database into a new model

@@ -23,6 +23,7 @@ crossorigin="anonymous"></script>
         <img id="screenshot-img">
         <p><button class="capture-button">Capture video</button> <button id="stop-button">Stop</button></p>
     </div>
+           
     <form method="POST" action ="/upload" enctype=multipart/form-data>
         <input id="imgtext" type="text" name="imagecode" style = "visibility: hidden">
         <input id = "uploadimage" type=submit value=Upload style = "visibility: hidden">
@@ -31,9 +32,28 @@ crossorigin="anonymous"></script>
         <p><button id="screenshot-button" disabled>Take screenshot</button></p>
     </div>
 
-    <form action='/face_comparision' method="POST">
+    <div>
+        {% for item in contents %}
+            <img src= {{ item }}>
+        {% endfor %}
+    </div>
+
+    <a href="/face_comparision"><button type="button">Recognizing Face</button></a>
+
+    <!-- <form action='/face_comparision' method="POST">
         <button name="Rekognization" type="Submit">Recognizing Face</button>
-    </form>    
+    </form>     -->
+
+    <ul>
+        {% for item in outcomes %}
+        <li>
+            <img src= {{ item['image'] }}>
+            <p>{{ item['confidence'] }}</p>
+        </li>   
+        {% endfor %}
+    </ul>
+    
+
     <script>
 
         // var url = '/image_link';
@@ -112,6 +132,8 @@ crossorigin="anonymous"></script>
               video.srcObject = stream;
             }
           })();
+
+
 
         // var rekognize = document.querySelector('#rekognize-face');
         // rekognize.click() = function(){action='/face_comparision'}
