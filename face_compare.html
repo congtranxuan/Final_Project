@@ -38,23 +38,21 @@ crossorigin="anonymous"></script>
         {% endfor %}
     </div>
 
-    <form action='/face_comparision' method="POST">
+    <a href="/face_comparision"><button type="button">Recognizing Face</button></a>
+
+    <!-- <form action='/face_comparision' method="POST">
         <button name="Rekognization" type="Submit">Recognizing Face</button>
-    </form>    
+    </form>     -->
 
-    <div>
+    <ul>
         {% for item in target_image %}
-            <img src= {{ item }}>
+        <li>
+            <img src= {{ item['image'] }}>
+            <p>{{ item['confidence'] }}</p>
+        </li>   
         {% endfor %}
-    </div>
+    </ul>
     
-    <div>
-        {% for item in confidence %}
-         <p>{{ item }}></p>
-           
-        {% endfor %}
-    </div>
-
 
     <script>
 
