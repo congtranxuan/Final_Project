@@ -1,4 +1,4 @@
-from Life_Expectancy.app import db
+from Image_rekognition.app import db
 
 db.drop_all()
 db.create_all()
