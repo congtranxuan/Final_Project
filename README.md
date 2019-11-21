@@ -60,7 +60,9 @@ Tools required:
 11.	Amazon Rekognition
 12.	Flask
 
-Platforms used:
+Platform used to to serve website:
+
+
 13.	Heroku
 
 ### Installing
