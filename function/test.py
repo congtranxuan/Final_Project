@@ -13,8 +13,9 @@ def detect_faces(photo, bucket):
         print('The detected face is between ' + str(faceDetail['AgeRange']['Low']) 
               + ' and ' + str(faceDetail['AgeRange']['High']) + ' years old')
         print('Here are the other attributes:')
-        print(json.dumps(faceDetail, indent=4, sort_keys=True))
-    return len(response['FaceDetails'])
+        print(json.dumps(faceDetail, indent=4))
+        print(json.dumps(response))
+    return response
 def main():
     photo = 'MisaelObregon.jpg'
     bucket = 'usersuploadimages'

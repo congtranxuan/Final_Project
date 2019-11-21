@@ -24,7 +24,7 @@ crossorigin="anonymous"></script>
         <p><button class="capture-button">Capture video</button> <button id="stop-button">Stop</button></p>
     </div>
            
-    <form method="POST" action ="/upload" enctype=multipart/form-data>
+    <form method="POST" action ="/upload_for_analysis" enctype=multipart/form-data>
         <input id="imgtext" type="text" name="imagecode" style = "visibility: hidden">
         <input id = "uploadimage" type=submit value=Upload style = "visibility: hidden">
     </form>
@@ -38,17 +38,16 @@ crossorigin="anonymous"></script>
         {% endfor %}
     </div>
 
-    <a href="/face_comparision"><button type="button">Recognizing Face</button></a>
+    <a href="/face_analyzing"><button type="button">Face Analysis</button></a>
 
     <!-- <form action='/face_comparision' method="POST">
         <button name="Rekognization" type="Submit">Recognizing Face</button>
     </form>     -->
 
     <ul>
-        {% for item in outcomes %}
+        {% for item in result %}
         <li>
-            <img src= {{ item['image'] }}>
-            <p>{{ item['confidence'] }}</p>
+            <p>{{ item }}</p>
         </li>   
         {% endfor %}
     </ul>
