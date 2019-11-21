@@ -74,8 +74,6 @@ def update_members():
         db.session.add(a_member)
         db.session.commit()
 
-        print("Database was updated a new member")
-
         imgstring = re.sub('^data:image/.+;base64,', '', imgstring)
         imgdata = base64.b64decode(imgstring)
         image_name = fullname + ".jpg"
@@ -84,7 +82,7 @@ def update_members():
 
         f.filename = image_name
         upload_file(f"{f.filename}", "usersuploadimages")
-        return redirect("/registration")
+        return redirect("/add_member")
 
 @app.route("/upload_compare", methods=['POST'])
 def upload_compare():
@@ -165,13 +163,16 @@ def face_analyzing():
         types = emotion['Type']
         confi = emotion['Confidence']
         result.append(f'{types} : {confi}')
-
     quality = face['Quality']
     for i in quality:
         result.append(f'{i} : {quality[i]}')
-    for j in face:
-        if j not in FEATURES_BLACKLIST:
-            result.append(f'{j} : {face[j]}')
+    for key, value in face.items():
+        if key not in FEATURES_BLACKLIST:
+            val = []
+            for f,v in value.items():
+                val.append(v)
+
+            result.append(f'{key}: {val}')
 	   
     filename = 'image_for_face_analysis.jpg'
     imglink = "https://sourceimageforrekognition.s3.us-east-2.amazonaws.com/" + filename
