@@ -16,10 +16,11 @@ from sqlalchemy import create_engine
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-#database_name = 'Team_member'
+
 database = "database-2"
 #engine = create_engine(f'postgresql://postgres:{password}@database-2.cq0ruejyag78.us-east-2.rds.amazonaws.com:5432/{database_name}')
 # conn = engine.connect()
+
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///static/db/Team_member.db"
 db = SQLAlchemy(app)
 
@@ -60,8 +61,6 @@ def registration():
         data["fullname"] = df.loc[i, "fullname"]
         data["email"] = df.loc[i, "email"]
         alist.append(data)
-    print(alist)
-
     return render_template("registration.html", contents=alist)
 
 @app.route("/update_members", methods=['POST'])
@@ -70,9 +69,6 @@ def update_members():
         imgstring = request.form['imagecode']
         fullname = request.form['fullname']
         email = request.form["email"]
-
-        print(fullname)
-        print(email)
 
         a_member = Member(fullname=fullname, email=email)
         db.session.add(a_member)
@@ -122,7 +118,6 @@ def face_compare():
     for i in range(len(df["fullname"])):
         KEY_TARGET = df.loc[i,"fullname"] + ".jpg"
         source_face, matches = compare_faces(SOURCE_BUCKET, KEY_SOURCE, TARGET_BUCKET, KEY_TARGET)
-        print(KEY_TARGET)
         data={}
         for match in matches:
             confidence = match['Face']['Confidence']
