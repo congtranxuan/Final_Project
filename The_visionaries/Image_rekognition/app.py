@@ -53,6 +53,7 @@ def registration():
     contents = pd.read_sql_query(stmt, db.session.bind)
     df = pd.DataFrame(contents)
     alist = []
+    print(df["fullname"])
     for i in range(len(df["fullname"])):
         data = {}
         image_name = "https://usersuploadimages.s3.us-east-2.amazonaws.com/" + \
@@ -61,6 +62,7 @@ def registration():
         data["fullname"] = df.loc[i, "fullname"]
         data["email"] = df.loc[i, "email"]
         alist.append(data)
+        print(alist)
     return render_template("registration.html", contents=alist)
 
 @app.route("/update_members", methods=['POST'])
@@ -115,7 +117,9 @@ def face_compare():
 
     for i in range(len(df["fullname"])):
         KEY_TARGET = df.loc[i,"fullname"] + ".jpg"
-        source_face, matches = compare_faces(SOURCE_BUCKET, KEY_SOURCE, TARGET_BUCKET, KEY_TARGET)
+        source_face, matches = compare_face(SOURCE_BUCKET, KEY_SOURCE, TARGET_BUCKET, KEY_TARGET)
+        print(KEY_TARGET)
+        print(matches)
         data={}
         for match in matches:
             confidence = match['Face']['Confidence']
@@ -190,7 +194,7 @@ def upload_file(file_name, bucket):
 
     return response
 
-def compare_faces(bucket, key, bucket_target, key_target, threshold=90, region="us-east-2"):
+def compare_face(bucket, key, bucket_target, key_target, threshold=90, region="us-east-2"):
     rekognition = boto3.client("rekognition",region)
     response = rekognition.compare_faces(
         SourceImage={
