@@ -1,5 +1,23 @@
 # Final_Project
 
+# AWS Configuration
+Required configuration for AWS Rekognition access are:
+pip install boto3
+pip install awscli
+
+aws config
+https://docs.aws.amazon.com/rekognition/latest/dg/setup-awscli-sdk.html
+For AWS configuration following details will be required.
+- Create an account with Identity and Access Management(IAM)
+-Using Users tab add user name. This will generate the Access Key ID and Secret Key to be input in aws config.
+-Select a state/timezone - the http link will contain the zone number.
+Add Groups (AWSrekognition)
+Add permissions: 
+- AmazonRekognitionReadOnlyAccess
+- AmazonRekognitionFullAccess
+- AmazonRekognitionServiceRole
+Use S3 to create buckets
+-Uncheck Block off public access
 
 
 
