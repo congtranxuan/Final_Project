@@ -7,7 +7,7 @@ The focus of this project demonstrates just one of the ways computer vision can 
 Computer vision is a growing innovative industry and one that has been used from recognizing objects during the manufacturing process for quality control, security recognition, and even highly accurate surgical procedures.   
 
 Our project can be found in the link below:
-https://PROVIDE-CORRECT-LINK-HERE-.herokuapp.com
+https://the-visionary.herokuapp.com/members
 
 ![](Images/ CORRECT IMAGE HERE .png)
 
