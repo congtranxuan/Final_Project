@@ -9,7 +9,6 @@ Computer vision is a growing innovative industry and one that has been used from
 Our project can be found in the link below:
 https://the-visionary.herokuapp.com/members
 
-![](Images/ CORRECT IMAGE HERE .png)
 
 ## Data Source: Computer Vision: The Story using Tableau
 Information on companies using Machine Vision (software) was collected from ThomasNet.com (https://www.thomasnet.com/products/machine-vision-software-45328275-1.html). A total of 68 companies are presented which include location, services provided and their respective industries, number of employees for each company, and specific use of machine vision software (specific uses not presented in Tableau visualizations). These data are presented in map format on Tableau and through the Tableau tooltip.  
@@ -86,7 +85,6 @@ Last but not least, download "https://github.com/congtranxuan/Final_Project" to 
    - templates contains (index.html)
 
 
-![](Images/ CORRECT IMAGE FILE HERE .jpg)
 
 ## Built With
 
@@ -94,7 +92,6 @@ Last but not least, download "https://github.com/congtranxuan/Final_Project" to 
 * [HTML]  - used to create the web template
 * [Heroku] (https://www.heroku.com) - used to deploy to online server
 
-![](Images/ CORRECT IMAGE HERE .png)
 
 ## Contributing
 
